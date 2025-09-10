@@ -138,7 +138,9 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("")
+            #if os(iOS)
             .navigationBarHidden(true)
+            #endif
         }
         .sheet(isPresented: $showingCamera) {
             CameraView()
