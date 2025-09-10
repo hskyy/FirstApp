@@ -89,16 +89,16 @@ struct ContentView: View {
                             )
                             
                             PricingOption(
-                                title: "5 Roasts",
-                                price: "$2.99",
-                                description: "Save $1.96",
+                                title: "3 Roasts",
+                                price: "$2.49",
+                                description: "Save $0.48",
                                 isPopular: true
                             )
                             
                             PricingOption(
-                                title: "10 Roasts",
-                                price: "$4.99",
-                                description: "Save $4.91",
+                                title: "5 Roasts",
+                                price: "$3.99",
+                                description: "Save $0.96",
                                 isPopular: false
                             )
                         }
