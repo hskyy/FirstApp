@@ -15,9 +15,11 @@ struct ImageSelectionView: View {
     @State private var showingActionSheet = false
     @State private var showingRoastResult = false
     @State private var showingNoCreditsAlert = false
+    @State private var navigateToPricing = false
     
     var body: some View {
-        VStack(spacing: 30) {
+        NavigationStack {
+            VStack(spacing: 30) {
             // Header
             VStack(spacing: 15) {
                 Text("Select Your Car Photo")
@@ -148,11 +150,15 @@ struct ImageSelectionView: View {
         }
         .alert("No Credits Remaining", isPresented: $showingNoCreditsAlert) {
             Button("Buy More") {
-                // This would navigate back to pricing
+                navigateToPricing = true
             }
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("You don't have any roast credits remaining. Purchase more credits to continue roasting cars!")
+        }
+        .navigationDestination(isPresented: $navigateToPricing) {
+            PricingView()
+        }
         }
     }
     
