@@ -186,10 +186,13 @@ struct ImagePicker: UIViewControllerRepresentable {
 struct RoastResultView: View {
     let selectedImage: UIImage?
     @Environment(\.presentationMode) var presentationMode
+    @StateObject private var openAIService = OpenAIService()
+    @State private var roastText: String?
+    @State private var hasGeneratedRoast = false
     
     var body: some View {
         VStack(spacing: 30) {
-            Text("Roast Result")
+            Text("Your Car Roast")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.top, 20)
@@ -203,31 +206,119 @@ struct RoastResultView: View {
             }
             
             VStack(spacing: 15) {
-                Text("🔥 Your AI Roast is Coming! 🔥")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.orange)
-                
-                Text("This is where the AI-generated roast will appear once we integrate ChatGPT. For now, this is a placeholder!")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 20)
+                if openAIService.isLoading {
+                    VStack(spacing: 15) {
+                        ProgressView()
+                            .scaleEffect(1.2)
+                        
+                        Text("🔥 Generating your roast... 🔥")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.orange)
+                        
+                        Text("Our AI is analyzing your car and crafting the perfect roast!")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                    }
+                } else if let roast = roastText {
+                    VStack(spacing: 15) {
+                        Text("🔥 Your AI Roast 🔥")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.orange)
+                        
+                        Text(roast)
+                            .font(.body)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 15)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.orange.opacity(0.1))
+                            )
+                            .padding(.horizontal, 20)
+                    }
+                } else if let error = openAIService.errorMessage {
+                    VStack(spacing: 15) {
+                        Text("❌ Oops!")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.red)
+                        
+                        Text(error)
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                    }
+                } else {
+                    VStack(spacing: 15) {
+                        Text("🔥 Ready to Get Roasted? 🔥")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.orange)
+                        
+                        Text("Tap the button below to generate your personalized car roast!")
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 20)
+                    }
+                }
             }
             
             Spacer()
             
-            Button("Close") {
-                presentationMode.wrappedValue.dismiss()
+            VStack(spacing: 15) {
+                if !hasGeneratedRoast && !openAIService.isLoading {
+                    Button("Generate My Roast!") {
+                        Task {
+                            await generateRoast()
+                        }
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.orange, .red]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(15)
+                    .padding(.horizontal, 20)
+                }
+                
+                Button("Close") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.gray)
+                .cornerRadius(15)
+                .padding(.horizontal, 20)
             }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.orange)
-            .cornerRadius(15)
-            .padding(.horizontal, 20)
             .padding(.bottom, 30)
         }
+        .onAppear {
+            if !hasGeneratedRoast {
+                Task {
+                    await generateRoast()
+                }
+            }
+        }
+    }
+    
+    private func generateRoast() async {
+        guard let image = selectedImage else { return }
+        
+        hasGeneratedRoast = true
+        roastText = await openAIService.generateRoast(for: image)
     }
 }
 
