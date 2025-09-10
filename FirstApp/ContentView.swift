@@ -8,141 +8,115 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showingCamera = false
+    @State private var showingPricing = false
     
     var body: some View {
         NavigationStack {
-            ScrollView(.vertical, showsIndicators: true) {
-                VStack(spacing: 30) {
-                    // Hero Section
-                    VStack(spacing: 20) {
-                        // App Icon/Logo
-                        ZStack {
-                            Circle()
-                                .fill(LinearGradient(
-                                    gradient: Gradient(colors: [.orange, .red]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ))
-                                .frame(width: 120, height: 120)
-                            
-                            Text("🔥")
-                                .font(.system(size: 60))
-                        }
+            VStack(spacing: 0) {
+                Spacer()
+                
+                // Hero Section
+                VStack(spacing: 20) {
+                    // App Icon/Logo
+                    ZStack {
+                        Circle()
+                            .fill(LinearGradient(
+                                gradient: Gradient(colors: [.orange, .red]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ))
+                            .frame(width: 100, height: 100)
                         
-                        // App Name
-                        Text("Roast My Ride")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                        
-                        // Tagline
-                        Text("Let AI roast your car to perfection")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
+                        Text("🔥")
+                            .font(.system(size: 50))
                     }
-                    .padding(.top, 40)
                     
-                    // How It Works Section
-                    VStack(alignment: .leading, spacing: 20) {
-                        Text("How It Works")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        VStack(spacing: 15) {
-                            HowItWorksStep(
-                                number: "1",
-                                title: "Take a Photo",
-                                description: "Snap a picture of your car",
-                                icon: "camera.fill"
-                            )
-                            
-                            HowItWorksStep(
-                                number: "2",
-                                title: "AI Analysis",
-                                description: "Our AI analyzes your ride",
-                                icon: "brain.head.profile"
-                            )
-                            
-                            HowItWorksStep(
-                                number: "3",
-                                title: "Get Roasted",
-                                description: "Receive your personalized roast",
-                                icon: "flame.fill"
-                            )
-                        }
-                    }
-                    .padding(.horizontal)
+                    // App Name
+                    Text("Roast My Ride")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
                     
-                    // Pricing Section
-                    VStack(spacing: 20) {
-                        Text("Pricing")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        VStack(spacing: 15) {
-                            PricingOption(
-                                title: "Single Roast",
-                                price: "$0.99",
-                                description: "One roast, one payment"
-                            )
-                            
-                            PricingOption(
-                                title: "3 Roasts",
-                                price: "$2.49",
-                                description: "Save $0.48",
-                                isPopular: true
-                            )
-                            
-                            PricingOption(
-                                title: "5 Roasts",
-                                price: "$3.99",
-                                description: "Save $0.96",
-                                isPopular: false
-                            )
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    // Call to Action
-                    VStack(spacing: 15) {
-                        Button(action: {
-                            showingCamera = true
-                        }) {
-                            HStack {
-                                Image(systemName: "camera.fill")
-                                Text("Start Roasting")
-                                    .fontWeight(.semibold)
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [.orange, .red]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(15)
-                        }
-                        .padding(.horizontal)
-                        
-                        Text("Join thousands of car owners who've been roasted!")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.bottom, 40)
+                    // Tagline
+                    Text("Let AI roast your car to perfection")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 20)
                 }
+                
+                Spacer()
+                
+                // How It Works Section
+                VStack(spacing: 15) {
+                    Text("How It Works")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    
+                    VStack(spacing: 12) {
+                        HowItWorksStep(
+                            number: "1",
+                            title: "Take a Photo",
+                            description: "Snap a picture of your car",
+                            icon: "camera.fill"
+                        )
+                        
+                        HowItWorksStep(
+                            number: "2",
+                            title: "AI Analysis",
+                            description: "Our AI analyzes your ride",
+                            icon: "brain.head.profile"
+                        )
+                        
+                        HowItWorksStep(
+                            number: "3",
+                            title: "Get Roasted",
+                            description: "Receive your personalized roast",
+                            icon: "flame.fill"
+                        )
+                    }
+                }
+                .padding(.horizontal, 30)
+                
+                Spacer()
+                
+                // Call to Action
+                VStack(spacing: 15) {
+                    Button(action: {
+                        showingPricing = true
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.right.circle.fill")
+                            Text("Get Started")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [.orange, .red]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(15)
+                    }
+                    .padding(.horizontal, 30)
+                    
+                    Text("Join thousands of car owners who've been roasted!")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 30)
+                }
+                .padding(.bottom, 40)
             }
             .navigationTitle("")
             .navigationBarHidden(true)
-            .scrollContentBackground(.hidden)
         }
-        .sheet(isPresented: $showingCamera) {
-            CameraView()
+        .sheet(isPresented: $showingPricing) {
+            PricingView()
         }
     }
 }
@@ -154,29 +128,30 @@ struct HowItWorksStep: View {
     let icon: String
     
     var body: some View {
-        HStack(spacing: 15) {
+        HStack(spacing: 12) {
             ZStack {
                 Circle()
                     .fill(Color.orange.opacity(0.2))
-                    .frame(width: 50, height: 50)
+                    .frame(width: 40, height: 40)
                 
                 Text(number)
-                    .font(.title2)
+                    .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.orange)
             }
             
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     Image(systemName: icon)
                         .foregroundColor(.orange)
+                        .font(.subheadline)
                     Text(title)
-                        .font(.headline)
+                        .font(.subheadline)
                         .fontWeight(.semibold)
                 }
                 
                 Text(description)
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
             
@@ -238,6 +213,91 @@ struct PricingOption: View {
                             .stroke(isPopular ? Color.orange : Color.clear, lineWidth: 2)
                     )
             )
+        }
+    }
+}
+
+struct PricingView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @State private var showingCamera = false
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 30) {
+                // Header
+                VStack(spacing: 15) {
+                    Text("Choose Your Plan")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    
+                    Text("Select how many roasts you'd like")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 20)
+                
+                // Pricing Options
+                VStack(spacing: 15) {
+                    PricingOption(
+                        title: "Single Roast",
+                        price: "$0.99",
+                        description: "One roast, one payment"
+                    )
+                    
+                    PricingOption(
+                        title: "3 Roasts",
+                        price: "$2.49",
+                        description: "Save $0.48",
+                        isPopular: true
+                    )
+                    
+                    PricingOption(
+                        title: "5 Roasts",
+                        price: "$3.99",
+                        description: "Save $0.96",
+                        isPopular: false
+                    )
+                }
+                .padding(.horizontal, 20)
+                
+                Spacer()
+                
+                // Purchase Button
+                Button(action: {
+                    showingCamera = true
+                }) {
+                    HStack {
+                        Image(systemName: "creditcard.fill")
+                        Text("Purchase & Start Roasting")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.orange, .red]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(15)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 30)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showingCamera) {
+            CameraView()
         }
     }
 }
