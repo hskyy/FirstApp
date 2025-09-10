@@ -18,8 +18,7 @@ class PaymentManager: ObservableObject {
     // Testing mode - set to true for development
     let isTestingMode = true
     
-    // Credit management
-    private let creditManager = CreditManager()
+    // Credit management - using shared instance
     
     private let productIdentifiers: Set<String> = [
         "com.roastmyride.single_roast",
@@ -122,12 +121,12 @@ class PaymentManager: ObservableObject {
     // MARK: - Credit Management
     
     func handleSuccessfulPurchase(for plan: PricingPlan) {
-        let credits = creditManager.getCreditsForPlan(plan)
-        creditManager.addCredits(credits)
+        let credits = CreditManager.shared.getCreditsForPlan(plan)
+        CreditManager.shared.addCredits(credits)
     }
     
     func getCreditManager() -> CreditManager {
-        return creditManager
+        return CreditManager.shared
     }
 }
 

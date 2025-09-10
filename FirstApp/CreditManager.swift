@@ -17,6 +17,9 @@ class CreditManager: ObservableObject {
     private let creditsKey = "availableCredits"
     private let totalCreditsKey = "totalCreditsPurchased"
     
+    // Shared instance for the app
+    static let shared = CreditManager()
+    
     init() {
         loadCredits()
     }

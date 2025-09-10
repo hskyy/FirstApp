@@ -157,8 +157,7 @@ struct ImageSelectionView: View {
     }
     
     private func checkCreditsAndProceed() {
-        let creditManager = CreditManager()
-        if creditManager.hasCredits() {
+        if CreditManager.shared.hasCredits() {
             showingRoastResult = true
         } else {
             showingNoCreditsAlert = true
@@ -167,7 +166,7 @@ struct ImageSelectionView: View {
 }
 
 struct CreditDisplayView: View {
-    @StateObject private var creditManager = CreditManager()
+    @ObservedObject private var creditManager = CreditManager.shared
     
     var body: some View {
         HStack {
@@ -183,9 +182,6 @@ struct CreditDisplayView: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.orange.opacity(0.1))
         )
-        .onAppear {
-            // Refresh credits when view appears
-        }
     }
 }
 
@@ -363,8 +359,7 @@ struct RoastResultView: View {
         guard let image = selectedImage else { return }
         
         // Check and deduct credit
-        let creditManager = CreditManager()
-        guard creditManager.useCredit() else {
+        guard CreditManager.shared.useCredit() else {
             errorMessage = "No credits remaining"
             return
         }
