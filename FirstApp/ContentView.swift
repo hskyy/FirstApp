@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var showingPricing = false
-    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -82,9 +80,7 @@ struct ContentView: View {
                 
                 // Call to Action
                 VStack(spacing: 15) {
-                    Button(action: {
-                        showingPricing = true
-                    }) {
+                    NavigationLink(destination: PricingView()) {
                         HStack {
                             Image(systemName: "arrow.right.circle.fill")
                             Text("Get Started")
@@ -114,9 +110,6 @@ struct ContentView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
-        }
-        .sheet(isPresented: $showingPricing) {
-            PricingView()
         }
     }
 }
@@ -218,84 +211,74 @@ struct PricingOption: View {
 }
 
 struct PricingView: View {
-    @Environment(\.presentationMode) var presentationMode
     @State private var showingCamera = false
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 30) {
-                // Header
-                VStack(spacing: 15) {
-                    Text("Choose Your Plan")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Text("Select how many roasts you'd like")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 20)
+        VStack(spacing: 30) {
+            // Header
+            VStack(spacing: 15) {
+                Text("Choose Your Plan")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
                 
-                // Pricing Options
-                VStack(spacing: 15) {
-                    PricingOption(
-                        title: "Single Roast",
-                        price: "$0.99",
-                        description: "One roast, one payment"
-                    )
-                    
-                    PricingOption(
-                        title: "3 Roasts",
-                        price: "$2.49",
-                        description: "Save $0.48",
-                        isPopular: true
-                    )
-                    
-                    PricingOption(
-                        title: "5 Roasts",
-                        price: "$3.99",
-                        description: "Save $0.96",
-                        isPopular: false
-                    )
-                }
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                // Purchase Button
-                Button(action: {
-                    showingCamera = true
-                }) {
-                    HStack {
-                        Image(systemName: "creditcard.fill")
-                        Text("Purchase & Start Roasting")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [.orange, .red]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(15)
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 30)
+                Text("Select how many roasts you'd like")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
+            .padding(.top, 20)
+            
+            // Pricing Options
+            VStack(spacing: 15) {
+                PricingOption(
+                    title: "Single Roast",
+                    price: "$0.99",
+                    description: "One roast, one payment"
+                )
+                
+                PricingOption(
+                    title: "3 Roasts",
+                    price: "$2.49",
+                    description: "Save $0.48",
+                    isPopular: true
+                )
+                
+                PricingOption(
+                    title: "5 Roasts",
+                    price: "$3.99",
+                    description: "Save $0.96",
+                    isPopular: false
+                )
             }
+            .padding(.horizontal, 20)
+            
+            Spacer()
+            
+            // Purchase Button
+            Button(action: {
+                showingCamera = true
+            }) {
+                HStack {
+                    Image(systemName: "creditcard.fill")
+                    Text("Purchase & Start Roasting")
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [.orange, .red]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(15)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 30)
         }
+        .navigationTitle("Pricing")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingCamera) {
             CameraView()
         }
