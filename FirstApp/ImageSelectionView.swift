@@ -144,7 +144,7 @@ struct ImageSelectionView: View {
             ImagePicker(selectedImage: $selectedImage, sourceType: .camera)
         }
         .sheet(isPresented: $showingRoastResult) {
-            RoastResultView(selectedImage: selectedImage)
+            RoastResultView(selectedImage: $selectedImage)
         }
         .alert("No Credits Remaining", isPresented: $showingNoCreditsAlert) {
             Button("Buy More") {
@@ -224,7 +224,7 @@ struct ImagePicker: UIViewControllerRepresentable {
 }
 
 struct RoastResultView: View {
-    let selectedImage: UIImage?
+    @Binding var selectedImage: UIImage?
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var openAIService = OpenAIService()
     @State private var roastText: String?
@@ -332,9 +332,30 @@ struct RoastResultView: View {
                     )
                     .cornerRadius(15)
                     .padding(.horizontal, 20)
+                } else if hasGeneratedRoast && roastText != nil {
+                    // Show "Try Another Car" button after roast is generated
+                    Button("Try Another Car") {
+                        // Clear the selected image so user can select a new one
+                        selectedImage = nil
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.orange, .red]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(15)
+                    .padding(.horizontal, 20)
                 }
                 
                 Button("Close") {
+                    // Clear the selected image so user can select a new one
+                    selectedImage = nil
                     presentationMode.wrappedValue.dismiss()
                 }
                 .foregroundColor(.white)
