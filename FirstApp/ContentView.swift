@@ -138,9 +138,7 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("")
-            #if os(iOS)
             .navigationBarHidden(true)
-            #endif
         }
         .sheet(isPresented: $showingCamera) {
             CameraView()
@@ -233,7 +231,7 @@ struct PricingOption: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.gray.opacity(0.1))
+                    .fill(Color(.systemGray6))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(isPopular ? Color.orange : Color.clear, lineWidth: 2)
