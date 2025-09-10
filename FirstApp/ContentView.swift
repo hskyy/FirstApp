@@ -301,7 +301,9 @@ struct PricingView: View {
         .navigationTitle("Pricing")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingCamera) {
-            CameraView()
+            NavigationView {
+                ImageSelectionView()
+            }
         }
         .alert("Payment", isPresented: $showingPaymentAlert) {
             Button("OK") {
@@ -329,26 +331,6 @@ struct PricingView: View {
     }
 }
 
-struct CameraView: View {
-    @Environment(\.presentationMode) var presentationMode
-    
-    var body: some View {
-        VStack {
-            Text("Camera View")
-                .font(.title)
-                .padding()
-            
-            Text("This is where the camera functionality will go!")
-                .foregroundColor(.secondary)
-                .padding()
-            
-            Button("Close") {
-                presentationMode.wrappedValue.dismiss()
-            }
-            .padding()
-        }
-    }
-}
 
 #Preview {
     ContentView()
