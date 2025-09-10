@@ -158,12 +158,16 @@ struct PricingOption: View {
     let price: String
     let description: String
     let isPopular: Bool
+    let isSelected: Bool
+    let onTap: () -> Void
     
-    init(title: String, price: String, description: String, isPopular: Bool = false) {
+    init(title: String, price: String, description: String, isPopular: Bool = false, isSelected: Bool = false, onTap: @escaping () -> Void = {}) {
         self.title = title
         self.price = price
         self.description = description
         self.isPopular = isPopular
+        self.isSelected = isSelected
+        self.onTap = onTap
     }
     
     var body: some View {
@@ -192,26 +196,64 @@ struct PricingOption: View {
                 
                 Spacer()
                 
-                Text(price)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.orange)
+                VStack(alignment: .trailing, spacing: 5) {
+                    Text(price)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.orange)
+                    
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.orange)
+                            .font(.title3)
+                    }
+                }
             }
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
+                    .fill(isSelected ? Color.orange.opacity(0.1) : Color(.systemGray6))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(isPopular ? Color.orange : Color.clear, lineWidth: 2)
+                            .stroke(isSelected ? Color.orange : (isPopular ? Color.orange : Color.clear), lineWidth: 2)
                     )
             )
+        }
+        .onTapGesture {
+            onTap()
         }
     }
 }
 
 struct PricingView: View {
     @State private var showingCamera = false
+    @State private var selectedPlan: PricingPlan = .threeRoasts
+    
+    enum PricingPlan: String, CaseIterable {
+        case single = "Single Roast"
+        case threeRoasts = "3 Roasts"
+        case fiveRoasts = "5 Roasts"
+        
+        var price: String {
+            switch self {
+            case .single: return "$0.99"
+            case .threeRoasts: return "$2.49"
+            case .fiveRoasts: return "$3.99"
+            }
+        }
+        
+        var description: String {
+            switch self {
+            case .single: return "One roast, one payment"
+            case .threeRoasts: return "Save $0.48"
+            case .fiveRoasts: return "Save $0.96"
+            }
+        }
+        
+        var isPopular: Bool {
+            return self == .threeRoasts
+        }
+    }
     
     var body: some View {
         VStack(spacing: 30) {
@@ -229,25 +271,17 @@ struct PricingView: View {
             
             // Pricing Options
             VStack(spacing: 15) {
-                PricingOption(
-                    title: "Single Roast",
-                    price: "$0.99",
-                    description: "One roast, one payment"
-                )
-                
-                PricingOption(
-                    title: "3 Roasts",
-                    price: "$2.49",
-                    description: "Save $0.48",
-                    isPopular: true
-                )
-                
-                PricingOption(
-                    title: "5 Roasts",
-                    price: "$3.99",
-                    description: "Save $0.96",
-                    isPopular: false
-                )
+                ForEach(PricingPlan.allCases, id: \.self) { plan in
+                    PricingOption(
+                        title: plan.rawValue,
+                        price: plan.price,
+                        description: plan.description,
+                        isPopular: plan.isPopular,
+                        isSelected: selectedPlan == plan
+                    ) {
+                        selectedPlan = plan
+                    }
+                }
             }
             .padding(.horizontal, 20)
             
@@ -259,7 +293,7 @@ struct PricingView: View {
             }) {
                 HStack {
                     Image(systemName: "creditcard.fill")
-                    Text("Purchase & Start Roasting")
+                    Text("Purchase \(selectedPlan.rawValue) - \(selectedPlan.price)")
                         .fontWeight(.semibold)
                 }
                 .foregroundColor(.white)
