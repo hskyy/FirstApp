@@ -226,34 +226,12 @@ struct PricingOption: View {
 }
 
 struct PricingView: View {
+    @StateObject private var paymentManager = PaymentManager()
     @State private var showingCamera = false
-    @State private var selectedPlan: PricingPlan = .threeRoasts
-    
-    enum PricingPlan: String, CaseIterable {
-        case single = "Single Roast"
-        case threeRoasts = "3 Roasts"
-        case fiveRoasts = "5 Roasts"
-        
-        var price: String {
-            switch self {
-            case .single: return "$0.99"
-            case .threeRoasts: return "$2.49"
-            case .fiveRoasts: return "$3.99"
-            }
-        }
-        
-        var description: String {
-            switch self {
-            case .single: return "One roast, one payment"
-            case .threeRoasts: return "Save $0.48"
-            case .fiveRoasts: return "Save $0.96"
-            }
-        }
-        
-        var isPopular: Bool {
-            return self == .threeRoasts
-        }
-    }
+    @State private var selectedPlan: PaymentManager.PricingPlan = .threeRoasts
+    @State private var showingPaymentAlert = false
+    @State private var paymentSuccess = false
+    @State private var errorMessage: String?
     
     var body: some View {
         VStack(spacing: 30) {
@@ -271,7 +249,7 @@ struct PricingView: View {
             
             // Pricing Options
             VStack(spacing: 15) {
-                ForEach(PricingPlan.allCases, id: \.self) { plan in
+                ForEach(PaymentManager.PricingPlan.allCases, id: \.self) { plan in
                     PricingOption(
                         title: plan.rawValue,
                         price: plan.price,
@@ -289,11 +267,19 @@ struct PricingView: View {
             
             // Purchase Button
             Button(action: {
-                showingCamera = true
+                Task {
+                    await handlePurchase()
+                }
             }) {
                 HStack {
-                    Image(systemName: "creditcard.fill")
-                    Text("Purchase \(selectedPlan.rawValue) - \(selectedPlan.price)")
+                    if paymentManager.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "creditcard.fill")
+                    }
+                    Text(paymentManager.isLoading ? "Processing..." : "Purchase \(selectedPlan.rawValue) - \(selectedPlan.price)")
                         .fontWeight(.semibold)
                 }
                 .foregroundColor(.white)
@@ -308,6 +294,7 @@ struct PricingView: View {
                 )
                 .cornerRadius(15)
             }
+            .disabled(paymentManager.isLoading)
             .padding(.horizontal, 20)
             .padding(.bottom, 30)
         }
@@ -316,6 +303,29 @@ struct PricingView: View {
         .sheet(isPresented: $showingCamera) {
             CameraView()
         }
+        .alert("Payment", isPresented: $showingPaymentAlert) {
+            Button("OK") {
+                if paymentSuccess {
+                    showingCamera = true
+                }
+            }
+        } message: {
+            Text(paymentSuccess ? 
+                 "Payment successful! You can now start roasting your car!" : 
+                 paymentManager.errorMessage ?? "Payment failed. Please try again.")
+        }
+    }
+    
+    private func handlePurchase() async {
+        guard let product = paymentManager.getProduct(for: selectedPlan) else {
+            errorMessage = "Product not available"
+            showingPaymentAlert = true
+            return
+        }
+        
+        let success = await paymentManager.purchase(product)
+        paymentSuccess = success
+        showingPaymentAlert = true
     }
 }
 
