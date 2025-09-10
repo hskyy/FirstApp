@@ -15,6 +15,9 @@ class PaymentManager: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
+    // Testing mode - set to true for development
+    let isTestingMode = true
+    
     private let productIdentifiers: Set<String> = [
         "com.roastmyride.single_roast",
         "com.roastmyride.three_roasts", 
@@ -22,6 +25,10 @@ class PaymentManager: ObservableObject {
     ]
     
     init() {
+        if isTestingMode {
+            // Skip loading real products in testing mode
+            return
+        }
         Task {
             await loadProducts()
         }
@@ -39,6 +46,14 @@ class PaymentManager: ObservableObject {
     }
     
     func purchase(_ product: Product) async -> Bool {
+        if isTestingMode {
+            // Simulate payment processing in testing mode
+            isLoading = true
+            try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 second delay
+            isLoading = false
+            return true
+        }
+        
         do {
             isLoading = true
             let result = try await product.purchase()
@@ -73,6 +88,10 @@ class PaymentManager: ObservableObject {
     }
     
     func getProduct(for plan: PricingPlan) -> Product? {
+        if isTestingMode {
+            // In testing mode, we'll handle this differently
+            return nil
+        }
         let identifier = getProductIdentifier(for: plan)
         return products.first { $0.id == identifier }
     }
@@ -101,6 +120,7 @@ class PaymentManager: ObservableObject {
 enum PaymentError: Error {
     case failedVerification
 }
+
 
 // Extension to match the PricingPlan enum from ContentView
 extension PaymentManager {
