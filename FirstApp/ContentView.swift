@@ -11,8 +11,8 @@ struct ContentView: View {
     @State private var showingCamera = false
     
     var body: some View {
-        NavigationView {
-            ScrollView {
+        NavigationStack {
+            ScrollView(.vertical, showsIndicators: true) {
                 VStack(spacing: 30) {
                     // Hero Section
                     VStack(spacing: 20) {
@@ -139,6 +139,7 @@ struct ContentView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
+            .scrollContentBackground(.hidden)
         }
         .sheet(isPresented: $showingCamera) {
             CameraView()
