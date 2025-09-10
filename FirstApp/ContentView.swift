@@ -233,7 +233,7 @@ struct PricingOption: View {
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
+                    .fill(Color.gray.opacity(0.1))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(isPopular ? Color.orange : Color.clear, lineWidth: 2)
