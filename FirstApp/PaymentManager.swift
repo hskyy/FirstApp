@@ -18,6 +18,9 @@ class PaymentManager: ObservableObject {
     // Testing mode - set to true for development
     let isTestingMode = true
     
+    // Credit management
+    private let creditManager = CreditManager()
+    
     private let productIdentifiers: Set<String> = [
         "com.roastmyride.single_roast",
         "com.roastmyride.three_roasts", 
@@ -114,6 +117,17 @@ class PaymentManager: ObservableObject {
         case .verified(let safe):
             return safe
         }
+    }
+    
+    // MARK: - Credit Management
+    
+    func handleSuccessfulPurchase(for plan: PricingPlan) {
+        let credits = creditManager.getCreditsForPlan(plan)
+        creditManager.addCredits(credits)
+    }
+    
+    func getCreditManager() -> CreditManager {
+        return creditManager
     }
 }
 

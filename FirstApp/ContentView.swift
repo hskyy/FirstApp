@@ -324,6 +324,10 @@ struct PricingView: View {
             paymentManager.isLoading = true
             try? await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 second delay
             paymentManager.isLoading = false
+            
+            // Add credits for the selected plan
+            paymentManager.handleSuccessfulPurchase(for: selectedPlan)
+            
             paymentSuccess = true
             showingPaymentAlert = true
             return

@@ -14,6 +14,7 @@ struct ImageSelectionView: View {
     @State private var showingCamera = false
     @State private var showingActionSheet = false
     @State private var showingRoastResult = false
+    @State private var showingNoCreditsAlert = false
     
     var body: some View {
         VStack(spacing: 30) {
@@ -27,6 +28,9 @@ struct ImageSelectionView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
+                
+                // Credit Display
+                CreditDisplayView()
             }
             .padding(.top, 20)
             
@@ -49,7 +53,7 @@ struct ImageSelectionView: View {
                         .foregroundColor(.orange)
                         
                         Button("This Looks Good!") {
-                            showingRoastResult = true
+                            checkCreditsAndProceed()
                         }
                         .foregroundColor(.white)
                         .padding(.horizontal, 20)
@@ -142,6 +146,46 @@ struct ImageSelectionView: View {
         .sheet(isPresented: $showingRoastResult) {
             RoastResultView(selectedImage: selectedImage)
         }
+        .alert("No Credits Remaining", isPresented: $showingNoCreditsAlert) {
+            Button("Buy More") {
+                // This would navigate back to pricing
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("You don't have any roast credits remaining. Purchase more credits to continue roasting cars!")
+        }
+    }
+    
+    private func checkCreditsAndProceed() {
+        let creditManager = CreditManager()
+        if creditManager.hasCredits() {
+            showingRoastResult = true
+        } else {
+            showingNoCreditsAlert = true
+        }
+    }
+}
+
+struct CreditDisplayView: View {
+    @StateObject private var creditManager = CreditManager()
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "flame.fill")
+                .foregroundColor(.orange)
+            Text("Roast Credits: \(creditManager.availableCredits)")
+                .font(.headline)
+                .fontWeight(.semibold)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.orange.opacity(0.1))
+        )
+        .onAppear {
+            // Refresh credits when view appears
+        }
     }
 }
 
@@ -189,6 +233,7 @@ struct RoastResultView: View {
     @StateObject private var openAIService = OpenAIService()
     @State private var roastText: String?
     @State private var hasGeneratedRoast = false
+    @State private var errorMessage: String?
     
     var body: some View {
         VStack(spacing: 30) {
@@ -241,7 +286,7 @@ struct RoastResultView: View {
                             )
                             .padding(.horizontal, 20)
                     }
-                } else if let error = openAIService.errorMessage {
+                } else if let error = openAIService.errorMessage ?? errorMessage {
                     VStack(spacing: 15) {
                         Text("❌ Oops!")
                             .font(.title2)
@@ -316,6 +361,13 @@ struct RoastResultView: View {
     
     private func generateRoast() async {
         guard let image = selectedImage else { return }
+        
+        // Check and deduct credit
+        let creditManager = CreditManager()
+        guard creditManager.useCredit() else {
+            errorMessage = "No credits remaining"
+            return
+        }
         
         hasGeneratedRoast = true
         roastText = await openAIService.generateRoast(for: image)
