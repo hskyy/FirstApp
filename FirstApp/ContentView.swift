@@ -227,6 +227,7 @@ struct PricingOption: View {
 
 struct PricingView: View {
     @StateObject private var paymentManager = PaymentManager()
+    @StateObject private var creditManager = CreditManager.shared
     @State private var showingCamera = false
     @State private var selectedPlan: PaymentManager.PricingPlan = .threeRoasts
     @State private var showingPaymentAlert = false
@@ -238,18 +239,20 @@ struct PricingView: View {
         VStack(spacing: 30) {
             // Header
             VStack(spacing: 15) {
-                Text("Choose Your Plan")
+                Text(creditManager.canUseFreeTrial() ? "Try Free or Choose Your Plan" : "Choose Your Plan")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 
-                Text("Select how many roasts you'd like")
+                Text(creditManager.canUseFreeTrial() ? 
+                     "Start with a free trial or select how many roasts you'd like" : 
+                     "Select how many roasts you'd like")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
             .padding(.top, 20)
             
             // Free Trial Option
-            if CreditManager.shared.canUseFreeTrial() {
+            if creditManager.canUseFreeTrial() {
                 VStack(spacing: 15) {
                     Text("Try It Free!")
                         .font(.title2)
