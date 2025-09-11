@@ -143,7 +143,31 @@ struct ContentView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 30)
                 }
-                .padding(.bottom, 40)
+                .padding(.bottom, 20)
+                
+                // App Info Footer
+                VStack(spacing: 8) {
+                    Divider()
+                        .background(Color.gray.opacity(0.3))
+                        .padding(.horizontal, 40)
+                    
+                    VStack(spacing: 4) {
+                        Text("Roast My Ride")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                        
+                        Text("Version 1.0")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        
+                        Text("Developed by Brian Hundley")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 8)
+                }
+                .padding(.bottom, 20)
             }
             .navigationTitle("")
             .navigationBarHidden(true)
