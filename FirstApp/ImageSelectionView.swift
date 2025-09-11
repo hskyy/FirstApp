@@ -160,6 +160,7 @@ struct ImageSelectionView: View {
         }
         .navigationTitle("Select Photo")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
     }
     
     private func checkCreditsAndProceed() {
