@@ -247,13 +247,11 @@ struct PricingView: View {
         VStack(spacing: 30) {
             // Header
             VStack(spacing: 15) {
-                Text(creditManager.canUseFreeTrial() ? "Try Free or Choose Your Plan" : "Choose Your Plan")
+                Text("Choose Your Plan")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 
-                Text(creditManager.canUseFreeTrial() ? 
-                     "Start with a free trial or select how many roasts you'd like" : 
-                     "Select how many roasts you'd like")
+                Text("Select how many roasts you'd like")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
