@@ -26,7 +26,7 @@ class OpenAIService: ObservableObject {
     }()
     
     // Using GPT-4 Vision for image analysis
-    private let model = "gpt-4-vision-preview"
+    private let model = "gpt-4o"
     
     func generateRoast(for image: UIImage) async -> String? {
         isLoading = true
@@ -87,7 +87,7 @@ class OpenAIService: ObservableObject {
         """
         
         let requestBody: [String: Any] = [
-            "model": "gpt-4-vision-preview",
+            "model": "gpt-4o",
             "messages": [
                 [
                     "role": "user",
