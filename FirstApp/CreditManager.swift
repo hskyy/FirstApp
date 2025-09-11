@@ -99,4 +99,10 @@ class CreditManager: ObservableObject {
     func addTestCredits(_ amount: Int = 5) {
         addCredits(amount)
     }
+    
+    // Temporary function to reset free trial for testing
+    func resetFreeTrial() {
+        hasUsedFreeTrial = false
+        saveCredits()
+    }
 }

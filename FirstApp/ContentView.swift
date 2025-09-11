@@ -41,6 +41,14 @@ struct ContentView: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 20)
+                    
+                    // Temporary button to reset free trial for testing
+                    Button("Reset Free Trial (Testing)") {
+                        CreditManager.shared.resetFreeTrial()
+                    }
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .padding(.top, 10)
                 }
                 
                 Spacer()
