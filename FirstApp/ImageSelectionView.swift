@@ -18,8 +18,7 @@ struct ImageSelectionView: View {
     @State private var navigateToPricing = false
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 30) {
+        VStack(spacing: 30) {
             // Header
             VStack(spacing: 15) {
                 Text("Select Your Car Photo")
@@ -159,7 +158,8 @@ struct ImageSelectionView: View {
         .navigationDestination(isPresented: $navigateToPricing) {
             PricingView()
         }
-        }
+        .navigationTitle("Select Photo")
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     private func checkCreditsAndProceed() {

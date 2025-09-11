@@ -236,12 +236,11 @@ struct PricingOption: View {
 struct PricingView: View {
     @StateObject private var paymentManager = PaymentManager()
     @StateObject private var creditManager = CreditManager.shared
-    @State private var showingCamera = false
+    @State private var navigateToImageSelection = false
     @State private var selectedPlan: PaymentManager.PricingPlan = .threeRoasts
     @State private var showingPaymentAlert = false
     @State private var paymentSuccess = false
     @State private var errorMessage: String?
-    @State private var navigateToImageSelection = false
     
     var body: some View {
         VStack(spacing: 30) {
@@ -347,24 +346,19 @@ struct PricingView: View {
         }
         .navigationTitle("Pricing")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingCamera) {
-            NavigationView {
-                ImageSelectionView()
-            }
+        .navigationDestination(isPresented: $navigateToImageSelection) {
+            ImageSelectionView()
         }
         .alert("Payment", isPresented: $showingPaymentAlert) {
             Button("OK") {
                 if paymentSuccess {
-                    showingCamera = true
+                    navigateToImageSelection = true
                 }
             }
         } message: {
             Text(paymentSuccess ? 
                  "Payment successful! You can now start roasting your car!" : 
                  paymentManager.errorMessage ?? "Payment failed. Please try again.")
-        }
-        .navigationDestination(isPresented: $navigateToImageSelection) {
-            ImageSelectionView()
         }
     }
     
