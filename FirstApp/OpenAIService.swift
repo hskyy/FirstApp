@@ -14,22 +14,36 @@ class OpenAIService: ObservableObject {
     
     // Your API key - add this securely in production
     // For now, we'll use simulated roasts for testing
-    private let apiKey = "YOUR_API_KEY_HERE"
+    private let apiKey: String = {
+        // Try to get from Config first, then environment variable, then fallback to placeholder
+        if Config.openAIAPIKey != "YOUR_ACTUAL_API_KEY_HERE" {
+            return Config.openAIAPIKey
+        }
+        if let envKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"], !envKey.isEmpty {
+            return envKey
+        }
+        return "YOUR_API_KEY_HERE"
+    }()
     
-    // For testing, we'll use GPT-4o mini (text-only)
-    // Later we can switch to gpt-4-vision-preview for image analysis
-    private let model = "gpt-4o-mini"
+    // Using GPT-4 Vision for image analysis
+    private let model = "gpt-4-vision-preview"
     
     func generateRoast(for image: UIImage) async -> String? {
         isLoading = true
         errorMessage = nil
         
-        // For testing with GPT-4o mini, we'll simulate a roast
-        // In production with GPT-4 Vision, we'll send the actual image
-        let simulatedRoast = await generateSimulatedRoast()
-        
-        isLoading = false
-        return simulatedRoast
+        // Check if we have a real API key
+        if apiKey != "YOUR_API_KEY_HERE" {
+            // Use real API
+            let result = await generateRealRoast(for: image)
+            isLoading = false
+            return result
+        } else {
+            // Use simulated roasts for testing
+            let result = await generateSimulatedRoast()
+            isLoading = false
+            return result
+        }
     }
     
     private func generateSimulatedRoast() async -> String? {
