@@ -242,9 +242,12 @@ struct RoastResultView: View {
     @Binding var selectedImage: UIImage?
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var openAIService = OpenAIService()
+    @StateObject private var creditManager = CreditManager.shared
     @State private var roastText: String?
     @State private var hasGeneratedRoast = false
     @State private var errorMessage: String?
+    @State private var showingEnjoymentAlert = false
+    @State private var showingReviewPrompt = false
     
     var body: some View {
         VStack(spacing: 30) {
@@ -352,6 +355,7 @@ struct RoastResultView: View {
                     Button("Try Another Car") {
                         // Clear the selected image so user can select a new one
                         selectedImage = nil
+                        checkForReviewPrompt()
                         presentationMode.wrappedValue.dismiss()
                     }
                     .foregroundColor(.white)
@@ -368,11 +372,12 @@ struct RoastResultView: View {
                     .padding(.horizontal, 20)
                 }
                 
-                Button("Close") {
-                    // Clear the selected image so user can select a new one
-                    selectedImage = nil
-                    presentationMode.wrappedValue.dismiss()
-                }
+                        Button("Close") {
+                            // Clear the selected image so user can select a new one
+                            selectedImage = nil
+                            checkForReviewPrompt()
+                            presentationMode.wrappedValue.dismiss()
+                        }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -388,6 +393,30 @@ struct RoastResultView: View {
                     await generateRoast()
                 }
             }
+        }
+        .alert("Are you enjoying this app?", isPresented: $showingEnjoymentAlert) {
+            Button("Yes! 😍") {
+                showingReviewPrompt = true
+            }
+            Button("Not really", role: .cancel) {
+                creditManager.markReviewPrompted()
+            }
+        } message: {
+            Text("We'd love to hear your feedback!")
+        }
+        .alert("Leave a Review", isPresented: $showingReviewPrompt) {
+            Button("Rate on App Store") {
+                // Open App Store review
+                if let url = URL(string: "https://apps.apple.com/app/id123456789?action=write-review") {
+                    UIApplication.shared.open(url)
+                }
+                creditManager.markReviewPrompted()
+            }
+            Button("Maybe Later", role: .cancel) {
+                creditManager.markReviewPrompted()
+            }
+        } message: {
+            Text("Your review helps other car owners discover this app! 🌟")
         }
     }
     
@@ -409,6 +438,15 @@ struct RoastResultView: View {
         
         hasGeneratedRoast = true
         roastText = await openAIService.generateRoast(for: image)
+        
+        // Mark first roast as completed
+        creditManager.markFirstRoastCompleted()
+    }
+    
+    private func checkForReviewPrompt() {
+        if creditManager.shouldPromptForReview() {
+            showingEnjoymentAlert = true
+        }
     }
 }
 

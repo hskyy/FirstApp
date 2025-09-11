@@ -13,11 +13,15 @@ class CreditManager: ObservableObject {
     @Published var availableCredits: Int = 0
     @Published var totalCreditsPurchased: Int = 0
     @Published var hasUsedFreeTrial: Bool = false
+    @Published var hasCompletedFirstRoast: Bool = false
+    @Published var hasBeenPromptedForReview: Bool = false
     
     private let userDefaults = UserDefaults.standard
     private let creditsKey = "availableCredits"
     private let totalCreditsKey = "totalCreditsPurchased"
     private let freeTrialKey = "hasUsedFreeTrial"
+    private let firstRoastKey = "hasCompletedFirstRoast"
+    private let reviewPromptedKey = "hasBeenPromptedForReview"
     
     // Shared instance for the app
     static let shared = CreditManager()
@@ -62,6 +66,20 @@ class CreditManager: ObservableObject {
         return true
     }
     
+    func markFirstRoastCompleted() {
+        hasCompletedFirstRoast = true
+        saveCredits()
+    }
+    
+    func markReviewPrompted() {
+        hasBeenPromptedForReview = true
+        saveCredits()
+    }
+    
+    func shouldPromptForReview() -> Bool {
+        return hasCompletedFirstRoast && !hasBeenPromptedForReview
+    }
+    
     func getCreditsForPlan(_ plan: PaymentManager.PricingPlan) -> Int {
         switch plan {
         case .single:
@@ -79,12 +97,16 @@ class CreditManager: ObservableObject {
         availableCredits = userDefaults.integer(forKey: creditsKey)
         totalCreditsPurchased = userDefaults.integer(forKey: totalCreditsKey)
         hasUsedFreeTrial = userDefaults.bool(forKey: freeTrialKey)
+        hasCompletedFirstRoast = userDefaults.bool(forKey: firstRoastKey)
+        hasBeenPromptedForReview = userDefaults.bool(forKey: reviewPromptedKey)
     }
     
     private func saveCredits() {
         userDefaults.set(availableCredits, forKey: creditsKey)
         userDefaults.set(totalCreditsPurchased, forKey: totalCreditsKey)
         userDefaults.set(hasUsedFreeTrial, forKey: freeTrialKey)
+        userDefaults.set(hasCompletedFirstRoast, forKey: firstRoastKey)
+        userDefaults.set(hasBeenPromptedForReview, forKey: reviewPromptedKey)
     }
     
     // MARK: - Testing
@@ -93,6 +115,8 @@ class CreditManager: ObservableObject {
         availableCredits = 0
         totalCreditsPurchased = 0
         hasUsedFreeTrial = false
+        hasCompletedFirstRoast = false
+        hasBeenPromptedForReview = false
         saveCredits()
     }
     
