@@ -122,11 +122,24 @@ class OpenAIService: ObservableObject {
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
             
+            // Debug: Print request details
+            print("Making API request to OpenAI...")
+            print("API Key starts with: \(String(apiKey.prefix(10)))...")
+            
             let (data, response) = try await URLSession.shared.data(for: request)
             
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode == 200 else {
-                errorMessage = "API request failed"
+            guard let httpResponse = response as? HTTPURLResponse else {
+                errorMessage = "Invalid response"
+                return nil
+            }
+            
+            if httpResponse.statusCode != 200 {
+                // Get error details from response
+                if let errorData = String(data: data, encoding: .utf8) {
+                    errorMessage = "API Error \(httpResponse.statusCode): \(errorData)"
+                } else {
+                    errorMessage = "API request failed with status: \(httpResponse.statusCode)"
+                }
                 return nil
             }
             
