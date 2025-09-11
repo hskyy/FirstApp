@@ -205,7 +205,7 @@ struct ImageSelectionView: View {
         }
         .alert("Leave a Review", isPresented: $showingReviewPrompt) {
             Button("Rate on App Store") {
-                // Open App Store review
+                // Open App Store review - UPDATE WITH ACTUAL APP ID
                 if let url = URL(string: "https://apps.apple.com/app/id123456789?action=write-review") {
                     UIApplication.shared.open(url)
                 }

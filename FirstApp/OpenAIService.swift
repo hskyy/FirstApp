@@ -34,7 +34,7 @@ class OpenAIService: ObservableObject {
     
     private func generateSimulatedRoast() async -> String? {
         // Simulate API call delay
-        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
         
         // Return a simulated roast for testing
         let roasts = [
