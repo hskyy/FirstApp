@@ -232,6 +232,7 @@ struct PricingView: View {
     @State private var showingPaymentAlert = false
     @State private var paymentSuccess = false
     @State private var errorMessage: String?
+    @State private var navigateToImageSelection = false
     
     var body: some View {
         VStack(spacing: 30) {
@@ -246,6 +247,43 @@ struct PricingView: View {
                     .foregroundColor(.secondary)
             }
             .padding(.top, 20)
+            
+            // Free Trial Option
+            if CreditManager.shared.canUseFreeTrial() {
+                VStack(spacing: 15) {
+                    Text("Try It Free!")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.green)
+                    
+                    Button(action: {
+                        navigateToImageSelection = true
+                    }) {
+                        HStack {
+                            Image(systemName: "gift.fill")
+                            Text("Start Free Trial - 1 Roast")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [.green, .blue]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(15)
+                    }
+                    .padding(.horizontal, 20)
+                    
+                    Text("Experience the app before purchasing!")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.bottom, 20)
+            }
             
             // Pricing Options
             VStack(spacing: 15) {
@@ -315,6 +353,9 @@ struct PricingView: View {
             Text(paymentSuccess ? 
                  "Payment successful! You can now start roasting your car!" : 
                  paymentManager.errorMessage ?? "Payment failed. Please try again.")
+        }
+        .navigationDestination(isPresented: $navigateToImageSelection) {
+            ImageSelectionView()
         }
     }
     

@@ -12,10 +12,12 @@ import SwiftUI
 class CreditManager: ObservableObject {
     @Published var availableCredits: Int = 0
     @Published var totalCreditsPurchased: Int = 0
+    @Published var hasUsedFreeTrial: Bool = false
     
     private let userDefaults = UserDefaults.standard
     private let creditsKey = "availableCredits"
     private let totalCreditsKey = "totalCreditsPurchased"
+    private let freeTrialKey = "hasUsedFreeTrial"
     
     // Shared instance for the app
     static let shared = CreditManager()
@@ -43,7 +45,21 @@ class CreditManager: ObservableObject {
     }
     
     func hasCredits() -> Bool {
-        return availableCredits > 0
+        return availableCredits > 0 || !hasUsedFreeTrial
+    }
+    
+    func canUseFreeTrial() -> Bool {
+        return !hasUsedFreeTrial
+    }
+    
+    func useFreeTrial() -> Bool {
+        guard canUseFreeTrial() else {
+            return false
+        }
+        
+        hasUsedFreeTrial = true
+        saveCredits()
+        return true
     }
     
     func getCreditsForPlan(_ plan: PaymentManager.PricingPlan) -> Int {
@@ -62,11 +78,13 @@ class CreditManager: ObservableObject {
     private func loadCredits() {
         availableCredits = userDefaults.integer(forKey: creditsKey)
         totalCreditsPurchased = userDefaults.integer(forKey: totalCreditsKey)
+        hasUsedFreeTrial = userDefaults.bool(forKey: freeTrialKey)
     }
     
     private func saveCredits() {
         userDefaults.set(availableCredits, forKey: creditsKey)
         userDefaults.set(totalCreditsPurchased, forKey: totalCreditsKey)
+        userDefaults.set(hasUsedFreeTrial, forKey: freeTrialKey)
     }
     
     // MARK: - Testing
@@ -74,6 +92,7 @@ class CreditManager: ObservableObject {
     func resetCredits() {
         availableCredits = 0
         totalCreditsPurchased = 0
+        hasUsedFreeTrial = false
         saveCredits()
     }
     

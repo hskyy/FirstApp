@@ -176,17 +176,25 @@ struct CreditDisplayView: View {
     
     var body: some View {
         HStack {
-            Image(systemName: "flame.fill")
-                .foregroundColor(.orange)
-            Text("Roast Credits: \(creditManager.availableCredits)")
-                .font(.headline)
-                .fontWeight(.semibold)
+            Image(systemName: creditManager.canUseFreeTrial() ? "gift.fill" : "flame.fill")
+                .foregroundColor(creditManager.canUseFreeTrial() ? .green : .orange)
+            
+            if creditManager.canUseFreeTrial() {
+                Text("Free Trial Available!")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.green)
+            } else {
+                Text("Roast Credits: \(creditManager.availableCredits)")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.orange.opacity(0.1))
+                .fill(creditManager.canUseFreeTrial() ? Color.green.opacity(0.1) : Color.orange.opacity(0.1))
         )
     }
 }
@@ -385,8 +393,15 @@ struct RoastResultView: View {
     private func generateRoast() async {
         guard let image = selectedImage else { return }
         
-        // Check and deduct credit
-        guard CreditManager.shared.useCredit() else {
+        // Check if user can use free trial or has credits
+        if CreditManager.shared.canUseFreeTrial() {
+            // Use free trial
+            CreditManager.shared.useFreeTrial()
+        } else if CreditManager.shared.availableCredits > 0 {
+            // Use regular credit
+            CreditManager.shared.useCredit()
+        } else {
+            // No credits or free trial available
             errorMessage = "No credits remaining"
             return
         }
