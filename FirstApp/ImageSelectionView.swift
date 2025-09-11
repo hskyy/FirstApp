@@ -16,6 +16,9 @@ struct ImageSelectionView: View {
     @State private var showingRoastResult = false
     @State private var showingNoCreditsAlert = false
     @State private var navigateToPricing = false
+    @State private var showingEnjoymentAlert = false
+    @State private var showingReviewPrompt = false
+    @StateObject private var creditManager = CreditManager.shared
     
     var body: some View {
         VStack(spacing: 30) {
@@ -144,7 +147,10 @@ struct ImageSelectionView: View {
         .sheet(isPresented: $showingCamera) {
             ImagePicker(selectedImage: $selectedImage, sourceType: .camera)
         }
-        .sheet(isPresented: $showingRoastResult) {
+        .sheet(isPresented: $showingRoastResult, onDismiss: {
+            // Check for review prompt when sheet is dismissed
+            checkForReviewPrompt()
+        }) {
             RoastResultView(selectedImage: $selectedImage)
         }
         .alert("No Credits Remaining", isPresented: $showingNoCreditsAlert) {
@@ -161,6 +167,30 @@ struct ImageSelectionView: View {
         .navigationTitle("Select Photo")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .alert("Are you enjoying this app?", isPresented: $showingEnjoymentAlert) {
+            Button("Yes! 😍") {
+                showingReviewPrompt = true
+            }
+            Button("Not really", role: .cancel) {
+                creditManager.markReviewPrompted()
+            }
+        } message: {
+            Text("We'd love to hear your feedback!")
+        }
+        .alert("Leave a Review", isPresented: $showingReviewPrompt) {
+            Button("Rate on App Store") {
+                // Open App Store review
+                if let url = URL(string: "https://apps.apple.com/app/id123456789?action=write-review") {
+                    UIApplication.shared.open(url)
+                }
+                creditManager.markReviewPrompted()
+            }
+            Button("Maybe Later", role: .cancel) {
+                creditManager.markReviewPrompted()
+            }
+        } message: {
+            Text("Your review helps other car owners discover this app! 🌟")
+        }
     }
     
     private func checkCreditsAndProceed() {
@@ -168,6 +198,12 @@ struct ImageSelectionView: View {
             showingRoastResult = true
         } else {
             showingNoCreditsAlert = true
+        }
+    }
+    
+    private func checkForReviewPrompt() {
+        if creditManager.shouldPromptForReview() {
+            showingEnjoymentAlert = true
         }
     }
 }
@@ -246,8 +282,6 @@ struct RoastResultView: View {
     @State private var roastText: String?
     @State private var hasGeneratedRoast = false
     @State private var errorMessage: String?
-    @State private var showingEnjoymentAlert = false
-    @State private var showingReviewPrompt = false
     
     var body: some View {
         VStack(spacing: 30) {
@@ -355,7 +389,6 @@ struct RoastResultView: View {
                     Button("Try Another Car") {
                         // Clear the selected image so user can select a new one
                         selectedImage = nil
-                        checkForReviewPrompt()
                         presentationMode.wrappedValue.dismiss()
                     }
                     .foregroundColor(.white)
@@ -375,7 +408,6 @@ struct RoastResultView: View {
                         Button("Close") {
                             // Clear the selected image so user can select a new one
                             selectedImage = nil
-                            checkForReviewPrompt()
                             presentationMode.wrappedValue.dismiss()
                         }
                 .foregroundColor(.white)
@@ -393,30 +425,6 @@ struct RoastResultView: View {
                     await generateRoast()
                 }
             }
-        }
-        .alert("Are you enjoying this app?", isPresented: $showingEnjoymentAlert) {
-            Button("Yes! 😍") {
-                showingReviewPrompt = true
-            }
-            Button("Not really", role: .cancel) {
-                creditManager.markReviewPrompted()
-            }
-        } message: {
-            Text("We'd love to hear your feedback!")
-        }
-        .alert("Leave a Review", isPresented: $showingReviewPrompt) {
-            Button("Rate on App Store") {
-                // Open App Store review
-                if let url = URL(string: "https://apps.apple.com/app/id123456789?action=write-review") {
-                    UIApplication.shared.open(url)
-                }
-                creditManager.markReviewPrompted()
-            }
-            Button("Maybe Later", role: .cancel) {
-                creditManager.markReviewPrompted()
-            }
-        } message: {
-            Text("Your review helps other car owners discover this app! 🌟")
         }
     }
     
@@ -441,12 +449,6 @@ struct RoastResultView: View {
         
         // Mark first roast as completed
         creditManager.markFirstRoastCompleted()
-    }
-    
-    private func checkForReviewPrompt() {
-        if creditManager.shouldPromptForReview() {
-            showingEnjoymentAlert = true
-        }
     }
 }
 
