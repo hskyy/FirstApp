@@ -18,12 +18,35 @@ struct ImageSelectionView: View {
     @State private var navigateToPricing = false
     @State private var showingEnjoymentAlert = false
     @State private var showingReviewPrompt = false
+    @State private var navigateToHome = false
     @StateObject private var creditManager = CreditManager.shared
     
     var body: some View {
         VStack(spacing: 30) {
             // Header
             VStack(spacing: 15) {
+                HStack {
+                    Button(action: {
+                        navigateToHome = true
+                    }) {
+                        HStack {
+                            Image(systemName: "house.fill")
+                            Text("Home")
+                        }
+                        .foregroundColor(.orange)
+                        .font(.headline)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.orange.opacity(0.1))
+                        )
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                
                 Text("Select Your Car Photo")
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -163,6 +186,9 @@ struct ImageSelectionView: View {
         }
         .navigationDestination(isPresented: $navigateToPricing) {
             PricingView()
+        }
+        .navigationDestination(isPresented: $navigateToHome) {
+            ContentView()
         }
         .navigationTitle("Select Photo")
         .navigationBarTitleDisplayMode(.inline)
