@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var creditManager = CreditManager.shared
+    @State private var navigateToImageSelection = false
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -88,25 +91,51 @@ struct ContentView: View {
                 
                 // Call to Action
                 VStack(spacing: 15) {
-                    NavigationLink(destination: PricingView()) {
-                        HStack {
-                            Image(systemName: "arrow.right.circle.fill")
-                            Text("Get Started")
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            LinearGradient(
-                                gradient: Gradient(colors: [.orange, .red]),
-                                startPoint: .leading,
-                                endPoint: .trailing
+                    if creditManager.hasCredits() {
+                        // User has credits, go straight to image selection
+                        Button(action: {
+                            navigateToImageSelection = true
+                        }) {
+                            HStack {
+                                Image(systemName: "camera.fill")
+                                Text("Start Roasting")
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.orange, .red]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             )
-                        )
-                        .cornerRadius(15)
+                            .cornerRadius(15)
+                        }
+                        .padding(.horizontal, 30)
+                    } else {
+                        // No credits, go to pricing
+                        NavigationLink(destination: PricingView()) {
+                            HStack {
+                                Image(systemName: "arrow.right.circle.fill")
+                                Text("Get Started")
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.orange, .red]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .cornerRadius(15)
+                        }
+                        .padding(.horizontal, 30)
                     }
-                    .padding(.horizontal, 30)
                     
                     Text("Join thousands of car owners who've been roasted!")
                         .font(.caption)
@@ -118,6 +147,9 @@ struct ContentView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
+            .navigationDestination(isPresented: $navigateToImageSelection) {
+                ImageSelectionView()
+            }
         }
     }
 }
